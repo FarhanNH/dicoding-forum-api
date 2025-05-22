@@ -20,6 +20,7 @@ exports.up = (pgm) => {
     },
     body: {
       type: 'TEXT',
+      notNull: true,
     },
     date: {
       type: 'TEXT',
@@ -27,6 +28,7 @@ exports.up = (pgm) => {
     },
     owner: {
       type: 'VARCHAR(50)',
+      notNull: true,
     },
   });
 

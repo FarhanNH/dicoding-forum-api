@@ -16,9 +16,11 @@ exports.up = (pgm) => {
     },
     owner: {
       type: 'VARCHAR(50)',
+      notNull: true,
     },
     comment_id: {
       type: 'VARCHAR(50)',
+      notNull: true,
     },
     date: {
       type: 'TEXT',
