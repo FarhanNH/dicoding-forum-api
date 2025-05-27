@@ -1,4 +1,5 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const RegisteredUser = require('../../Domains/users/entities/RegisteredUser');
 const UserRepository = require('../../Domains/users/UserRepository');
 
@@ -66,6 +67,20 @@ class UserRepositoryPostgres extends UserRepository {
     const { id } = result.rows[0];
 
     return id;
+  }
+
+  async getUserById(id) {
+    const query = {
+      text: 'SELECT * FROM users WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('user tidak ditemukan');
+    }
+
+    return result.rows[0];
   }
 }
 

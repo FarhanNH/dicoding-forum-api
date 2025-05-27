@@ -8,7 +8,7 @@ describe('a Thread entities', () => {
     };
 
     // Action and Assert
-    expect(() => new Thread(payload)).toThrowError('ADD_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new Thread(payload)).toThrowError('THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data type specification', () => {
@@ -20,7 +20,7 @@ describe('a Thread entities', () => {
     };
 
     // Action and Assert
-    expect(() => new Thread(payload)).toThrowError('ADD_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new Thread(payload)).toThrowError('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should throw error when title contains more than 50 character', () => {
@@ -32,7 +32,7 @@ describe('a Thread entities', () => {
     };
 
     // Action and Assert
-    expect(() => new Thread(payload)).toThrowError('ADD_THREAD.TITLE_LIMIT_CHAR');
+    expect(() => new Thread(payload)).toThrowError('THREAD.TITLE_LIMIT_CHAR');
   });
 
   it('should create addThread object correctly', () => {

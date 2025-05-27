@@ -45,7 +45,7 @@ describe('ThreadRepositoryPostgres', () => {
       const mockThread = {
         title: 'First Thread',
         body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        date: new Date(),
+        date: new Date().toISOString(),
         owner: mockUser.id,
       };
       const fakeIdGenerator = () => '123'; // stub!
@@ -55,7 +55,7 @@ describe('ThreadRepositoryPostgres', () => {
       await threadRepositoryPostgres.addThread(mockThread);
 
       // Assert
-      const addedThread = await ThreadsTableTestHelper.findThreadById('thread-123');
+      const addedThread = await ThreadsTableTestHelper.getThreadById('thread-123');
       expect(addedThread).toHaveLength(1);
     });
 
@@ -77,14 +77,12 @@ describe('ThreadRepositoryPostgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
       // Action
-      const addedThread = await threadRepositoryPostgres.addThread(mockThread);
+      const result = await threadRepositoryPostgres.addThread(mockThread);
 
       // Assert
-      expect(addedThread).toStrictEqual({
+      expect(result).toStrictEqual({
         id: 'thread-123',
         title: 'First Thread',
-        body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        date: date,
         owner: 'user-123',
       });
     });

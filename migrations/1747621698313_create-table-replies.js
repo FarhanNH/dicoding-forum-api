@@ -35,7 +35,7 @@ exports.up = (pgm) => {
   // memberikan constraint foreign key pada owner terhadap kolom id dari tabel users
   pgm.addConstraint('replies', 'fk_replies.owner_users.id', 'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE');
   // memberikan constraint foreign key pada comment_id terhadap kolom id dari tabel comments
-  pgm.addConstraint('replies', 'fk_replies.commentId_comments.id', 'FOREIGN KEY(owner) REFERENCES comments(id) ON DELETE CASCADE');
+  pgm.addConstraint('replies', 'fk_replies.comment_id_comments.id', 'FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE');
 };
 
 /**
@@ -46,8 +46,8 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   // menghapus constraint fk_replies.owner_users.id pada tabel replies
   pgm.dropConstraint('replies', 'fk_replies.owner_users.id');
-  // menghapus constraint fk_replies.commentId_comments.id pada tabel replies
-  pgm.dropConstraint('replies', 'fk_replies.commentId_comments.id');
+  // menghapus constraint fk_replies.comment_id_comments.id pada tabel replies
+  pgm.dropConstraint('replies', 'fk_replies.comment_id_comments.id');
 
   pgm.dropTable('replies');
 };

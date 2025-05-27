@@ -9,13 +9,13 @@ class Thread {
 
   _verifyPayload({ title, body, owner }) {
     if (!title || !body || !owner) {
-      throw new Error('ADD_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+      throw new Error('THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
     }
     if (typeof title !== 'string' || typeof body !== 'string' || typeof owner !== 'string') {
-      throw new Error('ADD_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
+      throw new Error('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
     if (title.length > 50) {
-      throw new Error('ADD_THREAD.TITLE_LIMIT_CHAR');
+      throw new Error('THREAD.TITLE_LIMIT_CHAR');
     }
   }
 }
