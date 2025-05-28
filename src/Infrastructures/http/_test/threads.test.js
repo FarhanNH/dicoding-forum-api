@@ -1,6 +1,7 @@
 const pool = require('../../database/postgres/pool');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
 
@@ -12,6 +13,7 @@ describe('/threads endpoint', () => {
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
+    await AuthenticationsTableTestHelper.cleanTable();
   });
 
   describe('when POST /threads', () => {
