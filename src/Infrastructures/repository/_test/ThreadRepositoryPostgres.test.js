@@ -1,6 +1,7 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
@@ -21,11 +22,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('verifyAvailableTitle function', () => {
     it('should throw InvariantError when title not available', async () => {
       // Arrange
-      const mockUser = {
-        id: 'user-123',
-        username: 'dicoding',
-      };
-      await UsersTableTestHelper.addUser(mockUser);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
       await ThreadsTableTestHelper.addThread({ title: 'First Thread' });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
@@ -37,16 +34,12 @@ describe('ThreadRepositoryPostgres', () => {
   describe('addThread function', () => {
     it('should persist add thread and return thread correctly', async () => {
       // Arrange
-      const mockUser = {
-        id: 'user-123',
-        username: 'dicoding',
-      };
-      await UsersTableTestHelper.addUser(mockUser);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
       const mockThread = {
         title: 'First Thread',
         body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
         date: new Date().toISOString(),
-        owner: mockUser.id,
+        owner: 'user-123',
       };
       const fakeIdGenerator = () => '123'; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
@@ -61,17 +54,13 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should return added thread correctly', async () => {
       // Arrange
-      const mockUser = {
-        id: 'user-123',
-        username: 'dicoding',
-      };
-      await UsersTableTestHelper.addUser(mockUser);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
       const date = new Date().toISOString();
       const mockThread = {
         title: 'First Thread',
         body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
         date: date,
-        owner: mockUser.id,
+        owner: 'user-123',
       };
       const fakeIdGenerator = () => '123'; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
@@ -85,6 +74,35 @@ describe('ThreadRepositoryPostgres', () => {
         title: 'First Thread',
         owner: 'user-123',
       });
+    });
+  });
+
+  describe('getThreadById function', () => {
+    it('should throw NotFoundError when thread not available', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
+
+      // Action
+      await expect(threadRepositoryPostgres.getThreadById('thread-1')).rejects.toThrowError(NotFoundError);
+    });
+
+    it('should persist get thread by id and return thread correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
+
+      // Action
+      const result = await threadRepositoryPostgres.getThreadById('thread-123');
+
+      // Assert
+      expect(result.id).toBeDefined();
+      expect(result.title).toBeDefined();
+      expect(result.body).toBeDefined();
+      expect(result.date).toBeDefined();
+      expect(result.owner).toBeDefined();
     });
   });
 });

@@ -1,4 +1,5 @@
 const InvariantError = require('./InvariantError');
+const NotFoundError = require('./NotFoundError');
 
 const DomainErrorTranslator = {
   translate(error) {
@@ -21,6 +22,7 @@ DomainErrorTranslator._directories = {
   'THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('title dan body harus string'),
   'THREAD.TITLE_LIMIT_CHAR': new InvariantError('tidak dapat membuat thread baru karena karakter title melebihi batas limit'),
   'THREAD_REPOSITORY.TITLE_ALREADY_EXISTS': new InvariantError('title tidak tersedia'),
+  'THREAD_REPOSITORY.THREAD_NOT_FOUND': new NotFoundError('thread tidak tersedia'),
 };
 
 module.exports = DomainErrorTranslator;
