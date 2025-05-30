@@ -30,6 +30,10 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
+    is_delete: {
+      type: 'boolean',
+      notNull: true,
+    },
   });
 
   // memberikan constraint foreign key pada owner terhadap kolom id dari tabel users
