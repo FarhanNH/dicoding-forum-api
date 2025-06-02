@@ -42,8 +42,8 @@ describe('DeleteCommentUseCase', () => {
 
     // mocking needed functions
     mockThreadRepository.getThreadById = jest.fn().mockImplementation(() => Promise.resolve());
-    mockCommentRepository.softDeleteComment = jest.fn().mockImplementation(() => Promise.resolve());
     mockCommentRepository.verifyCommentOwner = jest.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.softDeleteComment = jest.fn().mockImplementation(() => Promise.resolve());
 
     // create use case instance
     const deleteCommentUseCase = new DeleteCommentUseCase({
@@ -55,7 +55,6 @@ describe('DeleteCommentUseCase', () => {
     await deleteCommentUseCase.execute(payload.commentId, payload.threadId, payload.userId);
 
     // Assert
-    // Assert params
     expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(payload.threadId);
     expect(mockCommentRepository.verifyCommentOwner).toHaveBeenCalledWith(payload.commentId, payload.userId);
     expect(mockCommentRepository.softDeleteComment).toHaveBeenCalledWith(payload.commentId);

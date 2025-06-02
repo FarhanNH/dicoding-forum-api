@@ -1,6 +1,7 @@
 const DomainErrorTranslator = require('../DomainErrorTranslator');
 const InvariantError = require('../InvariantError');
 const NotFoundError = require('../NotFoundError');
+const AuthenticationError = require('../AuthenticationError');
 const AuthorizationError = require('../AuthorizationError');
 
 describe('DomainErrorTranslator', () => {
@@ -20,9 +21,12 @@ describe('DomainErrorTranslator', () => {
     expect(DomainErrorTranslator.translate(new Error('THREAD.TITLE_LIMIT_CHAR'))).toStrictEqual(new InvariantError('tidak dapat membuat thread baru karena karakter title melebihi batas limit'));
     expect(DomainErrorTranslator.translate(new Error('THREAD_REPOSITORY.TITLE_ALREADY_EXISTS'))).toStrictEqual(new InvariantError('title tidak tersedia'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.THREAD_NOT_FOUND'))).toStrictEqual(new NotFoundError('thread tidak tersedia'));
+    expect(DomainErrorTranslator.translate(new Error('THREAD.AUTHENTICATION_NOT_FOUND'))).toStrictEqual(new AuthenticationError('tidak memiliki akses'));
+    expect(DomainErrorTranslator.translate(new Error('THREAD.AUTHORIZATION_NOT_FOUND'))).toStrictEqual(new AuthorizationError('tidak memiliki akses'));
     expect(DomainErrorTranslator.translate(new Error('COMMENT.NOT_CONTAIN_NEEDED_PROPERTY'))).toStrictEqual(new InvariantError('harus mengirimkan content'));
     expect(DomainErrorTranslator.translate(new Error('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION'))).toStrictEqual(new InvariantError('content harus string'));
     expect(DomainErrorTranslator.translate(new Error('COMMENT.THREAD_NOT_FOUND'))).toStrictEqual(new NotFoundError('comment tidak tersedia'));
+    expect(DomainErrorTranslator.translate(new Error('COMMENT.AUTHENTICATION_NOT_FOUND'))).toStrictEqual(new AuthenticationError('tidak memiliki akses'));
     expect(DomainErrorTranslator.translate(new Error('COMMENT.AUTHORIZATION_NOT_FOUND'))).toStrictEqual(new AuthorizationError('tidak memiliki akses'));
   });
 
