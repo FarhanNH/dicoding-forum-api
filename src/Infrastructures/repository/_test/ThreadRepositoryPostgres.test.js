@@ -1,5 +1,6 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const pool = require('../../database/postgres/pool');
@@ -102,7 +103,55 @@ describe('ThreadRepositoryPostgres', () => {
       expect(result.title).toBeDefined();
       expect(result.body).toBeDefined();
       expect(result.date).toBeDefined();
-      expect(result.owner).toBeDefined();
+      expect(result.username).toBeDefined();
+    });
+  });
+
+  describe('getDetailThreadById', () => {
+    it('should throw NotFoundError when thread not found', async () => {
+      // Arrange
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      expect(threadRepositoryPostgres.getDetailThreadById('thread-123')).rejects.toThrowError(NotFoundError);
+    });
+
+    it('should return detail thread correctly', async () => {
+      // Arrange
+      const payload = {
+        thread_id: 'thread-123',
+      };
+      const mockComments = {
+        id: 'comment-123',
+        username: 'dicoding',
+        content: 'content',
+      };
+      const mockDetailThread = {
+        id: 'thread-123',
+        title: 'First Thread',
+        body: 'Lorem ipsum blablablabla',
+        username: 'dicoding',
+        comments: [mockComments],
+      };
+
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await CommentsTableTestHelper.addComment({});
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action
+      const detailThread = await threadRepositoryPostgres.getDetailThreadById(payload.thread_id);
+
+      // Assert
+      expect(detailThread.id).toBe(mockDetailThread.id);
+      expect(detailThread.title).toBe(mockDetailThread.title);
+      expect(detailThread.body).toBe(mockDetailThread.body);
+      expect(detailThread.date).toEqual(new Date(detailThread.date).toISOString());
+      expect(detailThread.username).toBe(mockDetailThread.username);
+      expect(detailThread.comments[0].id).toBe(mockComments.id);
+      expect(detailThread.comments[0].username).toBe(mockComments.username);
+      expect(detailThread.comments[0].date).toEqual(new Date(detailThread.comments[0].date).toISOString());
+      expect(detailThread.comments[0].content).toBe(mockComments.content);
     });
   });
 });
