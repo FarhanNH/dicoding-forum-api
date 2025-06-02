@@ -1,5 +1,6 @@
 const InvariantError = require('./InvariantError');
 const NotFoundError = require('./NotFoundError');
+const AuthorizationError = require('./AuthorizationError');
 
 const DomainErrorTranslator = {
   translate(error) {
@@ -26,6 +27,7 @@ DomainErrorTranslator._directories = {
   'COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('harus mengirimkan content'),
   'COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
   'COMMENT.THREAD_NOT_FOUND': new NotFoundError('comment tidak tersedia'),
+  'COMMENT.AUTHORIZATION_NOT_FOUND': new AuthorizationError('tidak memiliki akses'),
 };
 
 module.exports = DomainErrorTranslator;

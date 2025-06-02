@@ -33,6 +33,7 @@ exports.up = (pgm) => {
     is_delete: {
       type: 'boolean',
       notNull: true,
+      default: false,
     },
   });
 

@@ -21,16 +21,6 @@ const CommentsTableTestHelper = {
     return result.rows;
   },
 
-  async getCommentsByThreadId(id) {
-    const query = {
-      text: 'SELECT * FROM comments WHERE thread_id = $1',
-      values: [id],
-    };
-
-    const result = await pool.query(query);
-    return result.rows;
-  },
-
   async softDeleteComment({ id, thread_id, owner }) {
     const query = {
       text: 'UPDATE comments SET is_delete = true WHERE id = $1 AND thread_id = $2 AND owner = $3',

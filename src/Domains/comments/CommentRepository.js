@@ -5,7 +5,7 @@ class CommentRepository {
   async getCommentById(id) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
-  async getCommentsByThreadId() {
+  async verifyCommentOwner(commentId, owner) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
   async softDeleteComment() {
