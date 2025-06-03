@@ -107,13 +107,13 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
-  describe('getDetailThreadById', () => {
+  describe('getThreadCommentById', () => {
     it('should throw NotFoundError when thread not found', async () => {
       // Arrange
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action & Assert
-      expect(threadRepositoryPostgres.getDetailThreadById('thread-123')).rejects.toThrowError(NotFoundError);
+      expect(threadRepositoryPostgres.getThreadCommentById('thread-123')).rejects.toThrowError(NotFoundError);
     });
 
     it('should return detail thread correctly', async () => {
@@ -140,7 +140,7 @@ describe('ThreadRepositoryPostgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action
-      const detailThread = await threadRepositoryPostgres.getDetailThreadById(payload.thread_id);
+      const detailThread = await threadRepositoryPostgres.getThreadCommentById(payload.thread_id);
 
       // Assert
       expect(detailThread.id).toBe(mockDetailThread.id);
