@@ -14,7 +14,19 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
+    content: {
+      type: 'TEXT',
+      notNull: true,
+    },
+    date: {
+      type: 'TEXT',
+      notNull: true,
+    },
     owner: {
+      type: 'VARCHAR(50)',
+      notNull: true,
+    },
+    thread_id: {
       type: 'VARCHAR(50)',
       notNull: true,
     },
@@ -22,18 +34,19 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       notNull: true,
     },
-    date: {
-      type: 'TEXT',
+    is_delete: {
+      type: 'boolean',
       notNull: true,
-    },
-    content: {
-      type: 'TEXT',
-      notNull: true,
+      default: false,
     },
   });
 
   // memberikan constraint foreign key pada owner terhadap kolom id dari tabel users
   pgm.addConstraint('replies', 'fk_replies.owner_users.id', 'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE');
+
+  // memberikan constraint foreign key pada thread_id terhadap kolom id dari tabel threads
+  pgm.addConstraint('replies', 'fk_replies.thread_id_threads.id', 'FOREIGN KEY(thread_id) REFERENCES threads(id) ON DELETE CASCADE');
+
   // memberikan constraint foreign key pada comment_id terhadap kolom id dari tabel comments
   pgm.addConstraint('replies', 'fk_replies.comment_id_comments.id', 'FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE');
 };
@@ -46,6 +59,10 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   // menghapus constraint fk_replies.owner_users.id pada tabel replies
   pgm.dropConstraint('replies', 'fk_replies.owner_users.id');
+
+  // menghapus constraint fk_replies.thread_id_threads.id pada tabel replies
+  pgm.dropConstraint('replies', 'fk_replies.thread_id_threads.id');
+
   // menghapus constraint fk_replies.comment_id_comments.id pada tabel replies
   pgm.dropConstraint('replies', 'fk_replies.comment_id_comments.id');
 
