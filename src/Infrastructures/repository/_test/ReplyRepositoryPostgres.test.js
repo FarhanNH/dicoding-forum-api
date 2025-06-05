@@ -27,12 +27,7 @@ describe('ReplyRepositoryPostgres', () => {
     it('should throw error when payload not contain needed property', async () => {
       // Arrange
       const replyRepository = new ReplyRepositoryPostgres(pool, () => '123');
-      const invalidPayloads = [
-        { thread_id: 'thread-123', content: 'content' },
-        { comment_id: 'comment-123', content: 'content' },
-        { owner: 'user-123', content: 'content' },
-        { content: 'content', owner: 'user-123', thread_id: 'thread-123' },
-      ];
+      const invalidPayloads = [{ thread_id: 'thread-123', content: 'content' }, { comment_id: 'comment-123', content: 'content' }, { owner: 'user-123', content: 'content' }, { content: 'content', owner: 'user-123', thread_id: 'thread-123' }, {}];
 
       // Action & Assert
       await Promise.all(
@@ -100,7 +95,7 @@ describe('ReplyRepositoryPostgres', () => {
       const result = await replyRepository.addReply(mockReply);
 
       // Assert
-      expect(result[0]).toStrictEqual({
+      expect(result).toStrictEqual({
         id: 'reply-123',
         content: 'Ini balasan',
         owner: 'user-123',

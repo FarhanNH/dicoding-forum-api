@@ -33,7 +33,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('comment tidak ditemukan');
+      throw new NotFoundError('comment tidak tersedia');
     }
     return result.rows[0];
   }
@@ -46,7 +46,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('comment tidak ditemukan');
+      throw new NotFoundError('comment tidak tersedia');
     }
 
     const verified = result.rows[0].owner === owner;
@@ -63,7 +63,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('comment tidak ditemukan');
+      throw new NotFoundError('comment tidak tersedia');
     }
   }
 

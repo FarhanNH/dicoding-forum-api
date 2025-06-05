@@ -32,6 +32,11 @@ DomainErrorTranslator._directories = {
   'COMMENT.THREAD_NOT_FOUND': new NotFoundError('comment tidak tersedia'),
   'COMMENT.AUTHENTICATION_NOT_FOUND': new AuthenticationError('tidak memiliki akses'),
   'COMMENT.AUTHORIZATION_NOT_FOUND': new AuthorizationError('tidak memiliki akses'),
+  'REPLY.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('harus mengirimkan content'),
+  'REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
+  'REPLY.THREAD_NOT_FOUND': new NotFoundError('reply tidak tersedia'),
+  'REPLY.AUTHENTICATION_NOT_FOUND': new AuthenticationError('tidak memiliki akses'),
+  'REPLY.AUTHORIZATION_NOT_FOUND': new AuthorizationError('tidak memiliki akses'),
 };
 
 module.exports = DomainErrorTranslator;

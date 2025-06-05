@@ -13,7 +13,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const { content, date = new Date().toISOString(), owner, thread_id, comment_id } = payload;
     const id = `reply-${this._idGenerator()}`;
 
-    this._verifyPayload({ content, owner, thread_id, comment_id });
+    this._verifyReplyPayload({ content, owner, thread_id, comment_id });
 
     const query = {
       text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',
@@ -21,7 +21,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     };
 
     const result = await this._pool.query(query);
-    return result.rows;
+    return result.rows[0];
   }
 
   async getReplyById(id) {
@@ -67,7 +67,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     }
   }
 
-  _verifyPayload({ content, owner, thread_id, comment_id }) {
+  _verifyReplyPayload({ content, owner, thread_id, comment_id }) {
     if (!content || !owner || !thread_id || !comment_id) {
       throw new Error('REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
     }

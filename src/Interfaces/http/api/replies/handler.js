@@ -1,3 +1,5 @@
+const AddReplyUseCase = require('../../../../Applications/use_case/AddReplyUseCase');
+
 class RepliesHandler {
   constructor(container) {
     this._container = container;
@@ -13,7 +15,18 @@ class RepliesHandler {
       thread_id: threadId,
       comment_id: commentId,
     };
-    const addReplyUseCase = this._container.getInsta;
+
+    const addReplyUseCase = this._container.getInstance(AddReplyUseCase.name);
+    const AddedReply = await addReplyUseCase.execute(payload);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        AddedReply,
+      },
+    });
+    response.code(201);
+    return response;
   }
 }
 
