@@ -6,11 +6,12 @@ const pool = require('../src/Infrastructures/database/postgres/pool');
 const RepliesTableTestHelper = {
   async addReply({ id = 'reply-123', content = 'Ini balasan', date = new Date().toISOString(), owner = 'user-123', thread_id = 'thread-123', comment_id = 'comment-123' }) {
     const query = {
-      text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5, $6)',
+      text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',
       values: [id, content, date, owner, thread_id, comment_id],
     };
 
-    await pool.query(query);
+    const result = await pool.query(query);
+    return result.rows[0];
   },
 
   async getReplyById(id) {
@@ -53,7 +54,26 @@ const RepliesTableTestHelper = {
     }
   },
 
-  async getRepliesFromComment() {},
+  async getRepliesFromComment(id) {
+    const query = {
+      text: `SELECT replies.id, replies.content, replies.date, users.username,
+      CASE
+        WHEN replies.is_delete = TRUE THEN '**balasan telah dihapus**'
+        ELSE replies.content
+      END
+      FROM replies
+      JOIN users
+      ON replies.owner = users.id
+      JOIN comments
+      ON replies.comment_id = comments.id
+      WHERE comments.id = $1
+      ORDER BY replies.date ASC`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
+  },
 
   async cleanTable() {
     await pool.query('DELETE FROM replies WHERE 1=1');

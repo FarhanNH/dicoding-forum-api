@@ -231,7 +231,7 @@ describe('/comments endpoint', () => {
   });
 
   describe('/threads/{threadId}/comments/{commentId} endpoint ', () => {
-    describe('when POST /threads/{threadId}/comments/{commentId}', () => {
+    describe('when DELETE /threads/{threadId}/comments/{commentId}', () => {
       const passwordHash = new BcryptPasswordHash(bcrypt);
       it('passwordHash must be an instance of PasswordHash', () => {
         expect(passwordHash).toBeInstanceOf(PasswordHash);
@@ -265,7 +265,7 @@ describe('/comments endpoint', () => {
 
         // Action
         const response = await server.inject({
-          method: 'POST',
+          method: 'DELETE',
           url: `/threads/${thread[0].id}/comments/${comment[0].id}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -293,7 +293,7 @@ describe('/comments endpoint', () => {
 
         // Action
         const response = await server.inject({
-          method: 'POST',
+          method: 'DELETE',
           url: `/threads/${thread[0].id}/comments/${comment[0].id}`,
         });
 
@@ -331,7 +331,7 @@ describe('/comments endpoint', () => {
 
         // Action
         const response = await server.inject({
-          method: 'POST',
+          method: 'DELETE',
           url: `/threads/${thread[0].id}/comments/xxx`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -375,7 +375,7 @@ describe('/comments endpoint', () => {
 
         // Action
         const response = await server.inject({
-          method: 'POST',
+          method: 'DELETE',
           url: `/threads/${thread[0].id}/comments/${comment[0].id}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -205,4 +205,35 @@ describe('ReplyRepositoryPostgres', () => {
       expect(reply[0].is_delete).toBe(true);
     });
   });
+
+  describe('getRepliesFromComment', () => {
+    it('should return detail thread correctly', async () => {
+      // Arrange
+      const payload = {
+        comment_id: 'comment-123',
+      };
+
+      const mockReply = {
+        id: 'reply-123',
+        content: 'Ini balasan',
+        date: new Date().toISOString(),
+        username: 'dicoding',
+      };
+
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await CommentsTableTestHelper.addComment({});
+      await RepliesTableTestHelper.addReply({ id: mockReply.id, content: mockReply.content, date: mockReply.date });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      const reply = await replyRepositoryPostgres.getRepliesFromComment(payload.comment_id);
+
+      // Assert
+      expect(reply[0].id).toBe(mockReply.id);
+      expect(reply[0].content).toBe(mockReply.content);
+      expect(reply[0].date).toEqual(mockReply.date);
+      expect(reply[0].username).toBe(mockReply.username);
+    });
+  });
 });

@@ -8,7 +8,7 @@ const routes = (handler) => [
     },
   },
   {
-    method: 'POST',
+    method: 'DELETE',
     path: '/threads/{threadId}/comments/{commentId}',
     handler: handler.deleteCommentByIdHandler,
     options: {

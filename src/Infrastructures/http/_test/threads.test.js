@@ -1,4 +1,5 @@
 const pool = require('../../database/postgres/pool');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -15,6 +16,7 @@ describe('/threads endpoint', () => {
   });
 
   afterEach(async () => {
+    await RepliesTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
@@ -212,10 +214,12 @@ describe('/threads endpoint', () => {
       const mockUserId = 'user-123';
       const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
+      const mockReplyId = 'reply-123';
       const hashedPassword = await passwordHash.hash('secret');
       await UsersTableTestHelper.addUser({ id: mockUserId, username: 'dicoding', password: hashedPassword });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
       await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
+      await RepliesTableTestHelper.addReply({ id: mockReplyId, owner: mockUserId, thread_id: mockThreadId, comment_id: mockCommentId });
 
       // Action
       const response = await server.inject({

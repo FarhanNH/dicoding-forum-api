@@ -25,7 +25,7 @@ const ThreadsTableTestHelper = {
     return result.rows;
   },
 
-  async getThreadCommentById(id) {
+  async getDetailThreadById(id) {
     const thread = await this.getThreadById(id);
     const query = {
       text: `SELECT comments.id, users.username, comments.date, comments.content,

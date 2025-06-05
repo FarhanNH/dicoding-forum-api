@@ -254,5 +254,70 @@ describe('/comments endpoint', () => {
         expect(responseJson.message).toEqual('harus mengirimkan content');
       });
     });
+
+    describe('when DELETE /threads/{threadId}/comments/{commentId}/replies/{replyId}', () => {
+      it('should response 200 and persisted reply', async () => {
+        // Arrange
+        const server = await createServer(container);
+        const mockUser = {
+          id: 'user-123',
+          username: 'dicoding',
+          password: 'secret',
+        };
+        const mockUserX = {
+          id: 'user-999',
+          username: 'dimari',
+          password: 'secret',
+        };
+        const mockThreadId = 'thread-123';
+        const mockCommentId = 'comment-123';
+        const mockReplyId = 'reply-123';
+        const hashedPassword = await passwordHash.hash(mockUser.password);
+        await UsersTableTestHelper.addUser({ id: mockUser.id, username: mockUser.username, password: hashedPassword });
+        await UsersTableTestHelper.addUser({ id: mockUserX.id, username: mockUserX.username, password: hashedPassword });
+        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUser.id });
+        await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUser.id, thread_id: mockThreadId });
+        // await RepliesTableTestHelper.addReply({ id: mockReplyId, owner: mockUser.id, thread_id: mockThreadId, comment_id: mockCommentId });
+
+        const loginResponse = await server.inject({
+          method: 'POST',
+          url: '/authentications',
+          payload: {
+            username: mockUserX.username,
+            password: mockUserX.password,
+          },
+        });
+
+        const loginResponseJson = JSON.parse(loginResponse.payload);
+        const accessToken = loginResponseJson.data.accessToken;
+        const requestPayload = { content: 'Ini balasan' };
+
+        const addReplyResponse = await server.inject({
+          method: 'POST',
+          url: `/threads/${mockThreadId}/comments/${mockCommentId}/replies`,
+          payload: requestPayload,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const addReplyResponseJson = JSON.parse(addReplyResponse.payload);
+        const replyId = addReplyResponseJson.data.AddedReply.id;
+
+        // Action
+        const response = await server.inject({
+          method: 'DELETE',
+          url: `/threads/${mockThreadId}/comments/${mockCommentId}/replies/${replyId}`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        // Assert
+        const responseJson = JSON.parse(response.payload);
+        expect(response.statusCode).toEqual(200);
+        expect(responseJson.status).toEqual('success');
+      });
+    });
   });
 });
