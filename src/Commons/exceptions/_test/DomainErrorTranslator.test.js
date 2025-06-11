@@ -19,7 +19,6 @@ describe('DomainErrorTranslator', () => {
     expect(DomainErrorTranslator.translate(new Error('THREAD.NOT_CONTAIN_NEEDED_PROPERTY'))).toStrictEqual(new InvariantError('harus mengirimkan title dan body'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION'))).toStrictEqual(new InvariantError('title dan body harus string'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.TITLE_LIMIT_CHAR'))).toStrictEqual(new InvariantError('tidak dapat membuat thread baru karena karakter title melebihi batas limit'));
-    expect(DomainErrorTranslator.translate(new Error('THREAD_REPOSITORY.TITLE_ALREADY_EXISTS'))).toStrictEqual(new InvariantError('title tidak tersedia'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.THREAD_NOT_FOUND'))).toStrictEqual(new NotFoundError('thread tidak tersedia'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.AUTHENTICATION_NOT_FOUND'))).toStrictEqual(new AuthenticationError('tidak memiliki akses'));
     expect(DomainErrorTranslator.translate(new Error('THREAD.AUTHORIZATION_NOT_FOUND'))).toStrictEqual(new AuthorizationError('tidak memiliki akses'));

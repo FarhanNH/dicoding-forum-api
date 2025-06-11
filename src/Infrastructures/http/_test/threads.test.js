@@ -162,44 +162,6 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('harus mengirimkan title dan body');
     });
-
-    it('should response 400 when title unavailable', async () => {
-      // Arrange
-      const server = await createServer(container);
-      const mockUser = { id: 'user-123', username: 'dicoding', password: 'secret' };
-      const hashedPassword = await passwordHash.hash(mockUser.password);
-      await UsersTableTestHelper.addUser({ id: mockUser.id, username: mockUser.username, password: hashedPassword });
-      const loginResponse = await server.inject({
-        method: 'POST',
-        url: '/authentications',
-        payload: {
-          username: mockUser.username,
-          password: mockUser.password,
-        },
-      });
-      const loginResponseJson = JSON.parse(loginResponse.payload);
-      const accessToken = loginResponseJson.data.accessToken;
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: mockUser.id });
-      const requestPayload = {
-        title: 'First Thread',
-        body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-      };
-
-      // Action
-      const response = await server.inject({
-        method: 'POST',
-        url: '/threads',
-        payload: requestPayload,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      // Assert
-      const responseJson = JSON.parse(response.payload);
-      expect(response.statusCode).toEqual(400);
-      expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('title tidak tersedia');
-    });
   });
 
   describe('when GET /threads/{threadId}', () => {

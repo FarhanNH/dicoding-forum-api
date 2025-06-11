@@ -36,7 +36,6 @@ describe('AddCommentUseCase', () => {
 
     mockUserRepository.addUser = jest.fn().mockImplementation(() => Promise.resolve(useCasePayload.owner));
     mockUserRepository.getUserById = jest.fn().mockImplementation(() => Promise.resolve(useCasePayload.owner));
-    mockThreadRepository.verifyAvailableTitle = jest.fn().mockImplementation(() => Promise.resolve());
     mockThreadRepository.addThread = jest.fn().mockImplementation(() => Promise.resolve(mockThread));
     mockThreadRepository.getThreadById = jest.fn().mockImplementation(() => Promise.resolve(mockThread.id));
     mockCommentRepository.addComment = jest.fn().mockImplementation(() => Promise.resolve(mockComment));

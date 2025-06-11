@@ -10,7 +10,6 @@ class AddThreadUseCase {
     try {
       await this._userRepository.getUserById(useCasePayload.owner);
       const addThread = new Thread(useCasePayload);
-      await this._threadRepository.verifyAvailableTitle(addThread.title);
       return this._threadRepository.addThread(addThread);
     } catch (error) {
       throw error;
