@@ -23,51 +23,31 @@ describe('/comments endpoint', () => {
 
   describe('/threads/{threadId}/comments endpoint', () => {
     describe('when POST /threads/{threadId}/comments', () => {
+      const passwordHash = new BcryptPasswordHash(bcrypt);
+      it('passwordHash must be an instance of PasswordHash', () => {
+        expect(passwordHash).toBeInstanceOf(PasswordHash);
+      });
+
       it('should response 201 and persisted comment', async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUser = {
-          username: 'dicoding',
-          password: 'secret',
-          fullname: 'Dicoding Indonesia',
-        };
-
-        const userResponse = await server.inject({
-          method: 'POST',
-          url: '/users',
-          payload: mockUser,
-        });
-
-        const userResponseJson = JSON.parse(userResponse.payload);
-        const user = userResponseJson.data.addedUser;
+        const mockUserId = 'user-123';
+        const mockThreadId = 'thread-123';
+        const hashedPassword = await passwordHash.hash('secret');
+        await UsersTableTestHelper.addUser({ id: mockUserId, username: 'dicoding', password: hashedPassword });
+        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
 
         const loginResponse = await server.inject({
           method: 'POST',
           url: '/authentications',
           payload: {
-            username: user.username,
-            password: mockUser.password,
+            username: 'dicoding',
+            password: 'secret',
           },
         });
 
         const loginResponseJson = JSON.parse(loginResponse.payload);
         const accessToken = loginResponseJson.data.accessToken;
-
-        const mockThread = {
-          title: 'First Thread',
-          body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        };
-
-        const threadResponse = await server.inject({
-          method: 'POST',
-          url: '/threads',
-          payload: mockThread,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const threadResponseJson = JSON.parse(threadResponse.payload);
-        const threadId = threadResponseJson.data.addedThread.id;
 
         const requestPayload = {
           content: 'Ini komentar',
@@ -76,7 +56,7 @@ describe('/comments endpoint', () => {
         // Action
         const response = await server.inject({
           method: 'POST',
-          url: `/threads/${threadId}/comments`,
+          url: `/threads/${mockThreadId}/comments`,
           payload: requestPayload,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -114,27 +94,16 @@ describe('/comments endpoint', () => {
       it('should response 400 when comment with not found thread', async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUser = {
-          username: 'dicoding',
-          password: 'secret',
-          fullname: 'Dicoding Indonesia',
-        };
-
-        const userResponse = await server.inject({
-          method: 'POST',
-          url: '/users',
-          payload: mockUser,
-        });
-
-        const userResponseJson = JSON.parse(userResponse.payload);
-        const user = userResponseJson.data.addedUser;
+        const mockUserId = 'user-123';
+        const hashedPassword = await passwordHash.hash('secret');
+        await UsersTableTestHelper.addUser({ id: mockUserId, username: 'dicoding', password: hashedPassword });
 
         const loginResponse = await server.inject({
           method: 'POST',
           url: '/authentications',
           payload: {
-            username: user.username,
-            password: mockUser.password,
+            username: 'dicoding',
+            password: 'secret',
           },
         });
 
@@ -166,55 +135,30 @@ describe('/comments endpoint', () => {
       it('should response 400 when comment with bad payload', async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUser = {
-          username: 'dicoding',
-          password: 'secret',
-          fullname: 'Dicoding Indonesia',
-        };
-
-        const userResponse = await server.inject({
-          method: 'POST',
-          url: '/users',
-          payload: mockUser,
-        });
-
-        const userResponseJson = JSON.parse(userResponse.payload);
-        const user = userResponseJson.data.addedUser;
+        const mockUserId = 'user-123';
+        const mockThreadId = 'thread-123';
+        const hashedPassword = await passwordHash.hash('secret');
+        await UsersTableTestHelper.addUser({ id: mockUserId, username: 'dicoding', password: hashedPassword });
+        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
 
         const loginResponse = await server.inject({
           method: 'POST',
           url: '/authentications',
           payload: {
-            username: user.username,
-            password: mockUser.password,
+            username: 'dicoding',
+            password: 'secret',
           },
         });
 
         const loginResponseJson = JSON.parse(loginResponse.payload);
         const accessToken = loginResponseJson.data.accessToken;
 
-        const mockThread = {
-          title: 'First Thread',
-          body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        };
-
-        const threadResponse = await server.inject({
-          method: 'POST',
-          url: '/threads',
-          payload: mockThread,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const threadResponseJson = JSON.parse(threadResponse.payload);
-        const threadId = threadResponseJson.data.addedThread.id;
-
         const requestPayload = {};
 
         // Action
         const response = await server.inject({
           method: 'POST',
-          url: `/threads/${threadId}/comments`,
+          url: `/threads/${mockThreadId}/comments`,
           payload: requestPayload,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -308,14 +252,11 @@ describe('/comments endpoint', () => {
         const server = await createServer(container);
         const mockUserId = 'user-123';
         const mockThreadId = 'thread-123';
-        const mockCommentId = 'comment-123';
         const hashedPassword = await passwordHash.hash('secret');
         await UsersTableTestHelper.addUser({ id: mockUserId, username: 'dicoding', password: hashedPassword });
         const user = await UsersTableTestHelper.getUserById(mockUserId);
         await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
         const thread = await ThreadsTableTestHelper.getThreadById(mockThreadId);
-        // await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
-        // const comment = await CommentsTableTestHelper.getCommentById(mockCommentId);
 
         const loginResponse = await server.inject({
           method: 'POST',

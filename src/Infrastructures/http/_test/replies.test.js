@@ -271,13 +271,11 @@ describe('/comments endpoint', () => {
         };
         const mockThreadId = 'thread-123';
         const mockCommentId = 'comment-123';
-        const mockReplyId = 'reply-123';
         const hashedPassword = await passwordHash.hash(mockUser.password);
         await UsersTableTestHelper.addUser({ id: mockUser.id, username: mockUser.username, password: hashedPassword });
         await UsersTableTestHelper.addUser({ id: mockUserX.id, username: mockUserX.username, password: hashedPassword });
         await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUser.id });
         await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUser.id, thread_id: mockThreadId });
-        // await RepliesTableTestHelper.addReply({ id: mockReplyId, owner: mockUser.id, thread_id: mockThreadId, comment_id: mockCommentId });
 
         const loginResponse = await server.inject({
           method: 'POST',
