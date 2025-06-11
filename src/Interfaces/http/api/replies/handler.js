@@ -19,12 +19,12 @@ class RepliesHandler {
     };
 
     const addReplyUseCase = this._container.getInstance(AddReplyUseCase.name);
-    const AddedReply = await addReplyUseCase.execute(payload);
+    const addedReply = await addReplyUseCase.execute(payload);
 
     const response = h.response({
       status: 'success',
       data: {
-        AddedReply,
+        addedReply,
       },
     });
     response.code(201);

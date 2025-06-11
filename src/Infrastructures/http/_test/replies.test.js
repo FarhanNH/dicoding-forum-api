@@ -78,7 +78,7 @@ describe('/comments endpoint', () => {
         const responseJson = JSON.parse(response.payload);
         expect(response.statusCode).toEqual(201);
         expect(responseJson.status).toEqual('success');
-        expect(responseJson.data.AddedReply).toBeDefined();
+        expect(responseJson.data.addedReply).toBeDefined();
       });
 
       it('should response 401 when reply with no authentication', async () => {
@@ -302,7 +302,7 @@ describe('/comments endpoint', () => {
         });
 
         const addReplyResponseJson = JSON.parse(addReplyResponse.payload);
-        const replyId = addReplyResponseJson.data.AddedReply.id;
+        const replyId = addReplyResponseJson.data.addedReply.id;
 
         // Action
         const response = await server.inject({
