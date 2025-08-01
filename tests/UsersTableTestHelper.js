@@ -1,10 +1,11 @@
 /* istanbul ignore file */
-const pool = require('../src/Infrastructures/database/postgres/pool');
+const { DUMMY } = require("../src/Commons/utils/Constants");
+const pool = require("../src/Infrastructures/database/postgres/pool");
 
 const UsersTableTestHelper = {
-  async addUser({ id = 'user-123', username = 'dicoding', password = 'secret', fullname = 'Dicoding Indonesia' }) {
+  async addUser({ id = DUMMY.USER_ID, username = DUMMY.USER_USERNAME, password = DUMMY.USER_PASSWORD, fullname = DUMMY.USER_FULLNAME }) {
     const query = {
-      text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+      text: "INSERT INTO users VALUES($1, $2, $3, $4)",
       values: [id, username, password, fullname],
     };
 
@@ -13,7 +14,7 @@ const UsersTableTestHelper = {
 
   async getUserById(id) {
     const query = {
-      text: 'SELECT * FROM users WHERE id = $1',
+      text: "SELECT * FROM users WHERE id = $1",
       values: [id],
     };
 
@@ -22,7 +23,7 @@ const UsersTableTestHelper = {
   },
 
   async cleanTable() {
-    await pool.query('DELETE FROM users WHERE 1=1');
+    await pool.query("DELETE FROM users WHERE 1=1");
   },
 };
 

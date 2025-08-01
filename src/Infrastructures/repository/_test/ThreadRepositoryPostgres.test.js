@@ -1,12 +1,12 @@
-const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
-const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
-const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
-const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
-const pool = require('../../database/postgres/pool');
-const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
+const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper");
+const UsersTableTestHelper = require("../../../../tests/UsersTableTestHelper");
+const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper");
+const NotFoundError = require("../../../Commons/exceptions/NotFoundError");
+const ThreadRepositoryPostgres = require("../ThreadRepositoryPostgres");
+const pool = require("../../database/postgres/pool");
+const { DUMMY } = require("../../../Commons/utils/Constants");
 
-describe('ThreadRepositoryPostgres', () => {
+describe("ThreadRepositoryPostgres", () => {
   beforeAll(() => {
     jest.setTimeout(10000);
   });
@@ -20,38 +20,38 @@ describe('ThreadRepositoryPostgres', () => {
     await pool.end();
   });
 
-  describe('addThread function', () => {
-    it('should persist add thread and return thread correctly', async () => {
+  describe("addThread function", () => {
+    it("should persist add thread", async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER });
       const mockThread = {
-        title: 'First Thread',
-        body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        date: new Date().toISOString(),
-        owner: 'user-123',
+        title: DUMMY.THREAD_TITLE,
+        body: DUMMY.THREAD_BODY,
+        date: DUMMY.THREAD_DATE,
+        owner: DUMMY.OWNER,
       };
-      const fakeIdGenerator = () => '123'; // stub!
+      const fakeIdGenerator = () => "123"; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
       // Action
       await threadRepositoryPostgres.addThread(mockThread);
 
       // Assert
-      const addedThread = await ThreadsTableTestHelper.getThreadById('thread-123');
+      const addedThread = await ThreadsTableTestHelper.getThreadById(DUMMY.THREAD_ID);
       expect(addedThread).toHaveLength(1);
     });
 
-    it('should return added thread correctly', async () => {
+    it("should return added thread correctly", async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
-      const date = new Date().toISOString();
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER });
       const mockThread = {
-        title: 'First Thread',
-        body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-        date: date,
-        owner: 'user-123',
+        title: DUMMY.THREAD_TITLE,
+        body: DUMMY.THREAD_BODY,
+        date: DUMMY.THREAD_DATE,
+        owner: DUMMY.OWNER,
       };
-      const fakeIdGenerator = () => '123'; // stub!
+
+      const fakeIdGenerator = () => "123"; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
       // Action
@@ -59,32 +59,32 @@ describe('ThreadRepositoryPostgres', () => {
 
       // Assert
       expect(result).toStrictEqual({
-        id: 'thread-123',
-        title: 'First Thread',
-        owner: 'user-123',
+        id: DUMMY.THREAD_ID,
+        title: DUMMY.THREAD_TITLE,
+        owner: DUMMY.OWNER,
       });
     });
   });
 
-  describe('getThreadById function', () => {
-    it('should throw NotFoundError when thread not available', async () => {
+  describe("getThreadById function", () => {
+    it("should throw NotFoundError when thread not available", async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER });
+      await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
 
       // Action
-      await expect(threadRepositoryPostgres.getThreadById('thread-1')).rejects.toThrowError(NotFoundError);
+      await expect(threadRepositoryPostgres.getThreadById("thread-1")).rejects.toThrowError(NotFoundError);
     });
 
-    it('should persist get thread by id and return thread correctly', async () => {
+    it("should persist get thread by id and return thread correctly", async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER });
+      await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
 
       // Action
-      const result = await threadRepositoryPostgres.getThreadById('thread-123');
+      const result = await threadRepositoryPostgres.getThreadById(DUMMY.THREAD_ID);
 
       // Assert
       expect(result.id).toBeDefined();
@@ -95,30 +95,30 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
-  describe('getDetailThreadById', () => {
-    it('should throw NotFoundError when thread not found', async () => {
+  describe("getDetailThreadById", () => {
+    it("should throw NotFoundError when thread not found", async () => {
       // Arrange
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action & Assert
-      expect(threadRepositoryPostgres.getDetailThreadById('thread-123')).rejects.toThrowError(NotFoundError);
+      expect(threadRepositoryPostgres.getDetailThreadById(DUMMY.THREAD_ID)).rejects.toThrowError(NotFoundError);
     });
 
-    it('should return detail thread correctly', async () => {
+    it("should return detail thread correctly", async () => {
       // Arrange
       const payload = {
-        thread_id: 'thread-123',
+        thread_id: DUMMY.THREAD_ID,
       };
       const mockComments = {
-        id: 'comment-123',
-        username: 'dicoding',
-        content: 'content',
+        id: DUMMY.COMMENT_ID,
+        username: DUMMY.USER_USERNAME,
+        content: DUMMY.COMMENT_CONTENT,
       };
       const mockDetailThread = {
-        id: 'thread-123',
-        title: 'First Thread',
-        body: 'Lorem ipsum blablablabla',
-        username: 'dicoding',
+        id: DUMMY.THREAD_ID,
+        title: DUMMY.THREAD_TITLE,
+        body: DUMMY.THREAD_BODY,
+        username: DUMMY.USER_USERNAME,
         comments: [mockComments],
       };
 

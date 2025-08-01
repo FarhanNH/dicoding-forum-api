@@ -1,6 +1,6 @@
-const InvariantError = require('../../Commons/exceptions/InvariantError');
-const NotFoundError = require('../../Commons/exceptions/NotFoundError');
-const ThreadRepository = require('../../Domains/threads/ThreadRepository');
+const NotFoundError = require("../../Commons/exceptions/NotFoundError");
+const { NEW_DATE } = require("../../Commons/utils/Constants");
+const ThreadRepository = require("../../Domains/threads/ThreadRepository");
 
 class ThreadRepositoryPostgres extends ThreadRepository {
   constructor(pool, idGenerator) {
@@ -10,11 +10,11 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   }
 
   async addThread(thread) {
-    const { title, body, date = new Date().toISOString(), owner } = thread;
+    const { title, body, date = NEW_DATE, owner } = thread;
     const id = `thread-${this._idGenerator()}`;
 
     const query = {
-      text: 'INSERT INTO threads VALUES($1,$2,$3,$4,$5) RETURNING id, title, owner',
+      text: "INSERT INTO threads VALUES($1,$2,$3,$4,$5) RETURNING id, title, owner",
       values: [id, title, body, date, owner],
     };
 
@@ -36,7 +36,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new NotFoundError('THREAD.THREAD_NOT_FOUND');
+      throw new NotFoundError("THREAD.THREAD_NOT_FOUND");
     }
 
     return result.rows[0];

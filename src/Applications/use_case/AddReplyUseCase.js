@@ -1,4 +1,4 @@
-const Reply = require('../../Domains/replies/entities/Reply');
+const Reply = require("../../Domains/replies/entities/Reply");
 
 class AddReplyUseCase {
   constructor({ replyRepository, commentRepository, threadRepository, userRepository }) {
@@ -9,15 +9,11 @@ class AddReplyUseCase {
   }
 
   async execute(useCasePayload) {
-    try {
-      await this._userRepository.getUserById(useCasePayload.owner);
-      await this._threadRepository.getThreadById(useCasePayload.thread_id);
-      await this._commentRepository.getCommentById(useCasePayload.comment_id);
-      const reply = new Reply(useCasePayload);
-      return this._replyRepository.addReply(reply);
-    } catch (error) {
-      throw error;
-    }
+    await this._userRepository.getUserById(useCasePayload.owner);
+    await this._threadRepository.getThreadById(useCasePayload.thread_id);
+    await this._commentRepository.getCommentById(useCasePayload.comment_id);
+    const reply = new Reply(useCasePayload);
+    return this._replyRepository.addReply(reply);
   }
 }
 

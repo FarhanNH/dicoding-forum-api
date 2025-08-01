@@ -1,23 +1,23 @@
-const Thread = require('../../../Domains/threads/entities/Thread');
-const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const UserRepository = require('../../../Domains/users/UserRepository');
-const AddThreadUseCase = require('../AddThreadUseCase');
+const Thread = require("../../../Domains/threads/entities/Thread");
+const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const UserRepository = require("../../../Domains/users/UserRepository");
+const AddThreadUseCase = require("../AddThreadUseCase");
 
-describe('AddThreadUseCase', () => {
-  it('should orchestrating the add thread action correctly', async () => {
+describe("AddThreadUseCase", () => {
+  it("should orchestrating the add thread action correctly", async () => {
     // Arrange
     const mockUser = {
-      id: 'user-123',
+      id: "user-123",
     };
 
     const useCasePayload = {
-      title: 'First Thread',
-      body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
+      title: "First Thread",
+      body: "Lorem ipsum asdadadjakkafkahfkakfdajkfj",
       owner: mockUser.id,
     };
 
     const mockAddedThread = {
-      id: 'thread-123',
+      id: "thread-123",
       ...useCasePayload,
     };
 
@@ -26,22 +26,21 @@ describe('AddThreadUseCase', () => {
     const mockUserRepository = new UserRepository();
 
     /** mocking needed function */
-    mockUserRepository.addUser = jest.fn().mockImplementation(() => Promise.resolve(useCasePayload.owner));
     mockUserRepository.getUserById = jest.fn().mockImplementation(() => Promise.resolve(useCasePayload.owner));
     mockThreadRepository.addThread = jest.fn().mockImplementation(() => Promise.resolve(mockAddedThread));
 
     /** creating use case instance */
-    const getThreadUseCase = new AddThreadUseCase({
+    const addThreadUseCase = new AddThreadUseCase({
       threadRepository: mockThreadRepository,
       userRepository: mockUserRepository,
     });
 
     // Action
-    const addedThread = await getThreadUseCase.execute(useCasePayload);
+    const addedThread = await addThreadUseCase.execute(useCasePayload);
 
     // Assert
     expect(addedThread).toStrictEqual({
-      id: 'thread-123',
+      id: "thread-123",
       title: useCasePayload.title,
       body: useCasePayload.body,
       owner: useCasePayload.owner,

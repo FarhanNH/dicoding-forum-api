@@ -1,10 +1,11 @@
 /* istanbul ignore file */
-const pool = require('../src/Infrastructures/database/postgres/pool');
+const pool = require("../src/Infrastructures/database/postgres/pool");
+const { DUMMY } = require("../src/Commons/utils/Constants");
 
 const CommentsTableTestHelper = {
-  async addComment({ id = 'comment-123', owner = 'user-123', thread_id = 'thread-123', date = new Date().toISOString(), content = 'content' }) {
+  async addComment({ id = DUMMY.COMMENT_ID, owner = DUMMY.OWNER, thread_id = DUMMY.THREAD_ID, date = DUMMY.DATE, content = DUMMY.COMMENT_CONTENT }) {
     const query = {
-      text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5)',
+      text: "INSERT INTO comments VALUES($1, $2, $3, $4, $5)",
       values: [id, owner, thread_id, date, content],
     };
 
@@ -13,7 +14,7 @@ const CommentsTableTestHelper = {
 
   async getCommentById(id) {
     const query = {
-      text: ' SELECT * FROM comments WHERE id = $1',
+      text: " SELECT * FROM comments WHERE id = $1",
       values: [id],
     };
 
@@ -23,14 +24,14 @@ const CommentsTableTestHelper = {
 
   async softDeleteComment({ id, thread_id, owner }) {
     const query = {
-      text: 'UPDATE comments SET is_delete = true WHERE id = $1 AND thread_id = $2 AND owner = $3',
+      text: "UPDATE comments SET is_delete = true WHERE id = $1 AND thread_id = $2 AND owner = $3",
       values: [id, thread_id, owner],
     };
     await pool.query(query);
   },
 
   async cleanTable() {
-    await pool.query('DELETE FROM comments WHERE 1=1');
+    await pool.query("DELETE FROM comments WHERE 1=1");
   },
 };
 
