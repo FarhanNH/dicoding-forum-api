@@ -133,34 +133,50 @@ describe("/threads endpoint", () => {
   });
 
   describe("when GET /threads/{threadId}", () => {
-    const passwordHash = new BcryptPasswordHash(bcrypt);
-    it("passwordHash must be an instance of PasswordHash", () => {
-      expect(passwordHash).toBeInstanceOf(PasswordHash);
-    });
-
-    it("should response 200 and persisted thread with comment", async () => {
+    it("should response 200 and return thread detail", async () => {
       // Arrange
       const server = await createServer(container);
-      const mockUserId = DUMMY.USER_ID;
-      const mockThreadId = "thread-123";
-      const mockCommentId = "comment-123";
-      const mockReplyId = "reply-123";
-      const hashedPassword = await passwordHash.hash(DUMMY.USER_PASSWORD);
-      await UsersTableTestHelper.addUser({ id: mockUserId, username: DUMMY.USER_USERNAME, password: hashedPassword });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
-      await RepliesTableTestHelper.addReply({ id: mockReplyId, owner: mockUserId, thread_id: mockThreadId, comment_id: mockCommentId });
+      const { accessToken, id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+
+      const threadId = "thread-123";
+      await ThreadsTableTestHelper.addThread({
+        id: threadId,
+        title: DUMMY.THREAD_TITLE,
+        body: DUMMY.THREAD_BODY,
+        owner: id,
+      });
 
       // Action
       const response = await server.inject({
         method: "GET",
-        url: `/threads/${mockThreadId}`,
+        url: `/threads/${threadId}`,
       });
 
       // Assert
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual("success");
+      expect(responseJson.data.thread).toBeDefined();
+      expect(responseJson.data.thread.id).toEqual(threadId);
+      expect(responseJson.data.thread.title).toEqual(DUMMY.THREAD_TITLE);
+      expect(responseJson.data.thread.body).toEqual(DUMMY.THREAD_BODY);
+    });
+
+    it("should response 404 when thread not found", async () => {
+      // Arrange
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: "GET",
+        url: "/threads/thread-999",
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual("fail");
+      expect(responseJson.message).toEqual("thread tidak tersedia");
     });
   });
 });

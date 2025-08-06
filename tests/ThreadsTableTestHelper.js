@@ -26,33 +26,6 @@ const ThreadsTableTestHelper = {
     return result.rows;
   },
 
-  async getDetailThreadById(id) {
-    const thread = await this.getThreadById(id);
-    const query = {
-      text: `SELECT comments.id, users.username, comments.date, comments.content,
-      CASE 
-          WHEN comments.is_delete = TRUE THEN '**komentar telah dihapus**'
-          ELSE comments.content
-      END
-      FROM comments
-      JOIN users
-      ON comments.owner = users.id
-      JOIN threads
-      ON comments.thread_id = threads.id
-      WHERE threads.id = $1
-      ORDER BY comments.date ASC`,
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-    const comments = result.rows;
-    const detailThread = {
-      ...thread,
-      comments,
-    };
-    return detailThread;
-  },
-
   async cleanTable() {
     await pool.query("DELETE FROM threads WHERE 1=1");
   },

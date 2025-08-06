@@ -126,6 +126,38 @@ describe("CommentRepositoryPostgres", () => {
     });
   });
 
+  describe("getCommentByThreadId function", () => {
+    it("should return all comments in detail thread", async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER, username: DUMMY.USER_USERNAME });
+      await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID, owner: DUMMY.OWNER });
+      await CommentsTableTestHelper.addComment({
+        id: DUMMY.COMMENT_ID,
+        owner: DUMMY.OWNER,
+        thread_id: DUMMY.THREAD_ID,
+        date: DUMMY.DATE,
+        content: DUMMY.COMMENT_CONTENT,
+        is_delete: false,
+      });
+
+      // Action
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+
+      // Assert
+      const detailComment = await commentRepositoryPostgres.getCommentByThreadId(DUMMY.THREAD_ID);
+
+      expect(detailComment).toEqual([
+        {
+          id: DUMMY.COMMENT_ID,
+          username: DUMMY.USER_USERNAME,
+          date: DUMMY.DATE,
+          content: DUMMY.COMMENT_CONTENT,
+          deleted: false,
+        },
+      ]);
+    });
+  });
+
   describe("verifyCommentOwner function", () => {
     it("should throw NotFoundError when comment not found", async () => {
       // Arrange

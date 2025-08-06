@@ -1,66 +1,80 @@
-const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
-const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const GetDetailThreadUseCase = require('../GetDetailThreadUseCase');
+const ReplyRepository = require("../../../Domains/replies/ReplyRepository");
+const CommentRepository = require("../../../Domains/comments/CommentRepository");
+const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const GetDetailThreadUseCase = require("../GetDetailThreadUseCase");
+const { DUMMY } = require("../../../Commons/utils/Constants");
 
-describe('GetDetailThreadUseCase', () => {
-  it('should orchectrating the get thread with comment action correctly', async () => {
+describe("GetDetailThreadUseCase", () => {
+  it("should orchectrating the get detail thread action correctly", async () => {
     // Arrange
-    const payload = {
-      threadId: 'thread-123',
-    };
-    const newDate = new Date().toISOString();
-
-    const mockReply = {
-      id: 'reply-123',
-      content: 'Ini balasan',
-      date: newDate,
-      username: 'dicoding',
+    const useCaseParams = {
+      threadId: DUMMY.THREAD_ID,
     };
 
-    const mockThread = {
-      id: payload.threadId,
-      title: 'First Thread',
-      body: 'Lorem ipsum asdadadjakkafkahfkakfdajkfj',
-      date: newDate,
-      username: 'dicoding',
-      comments: [
-        {
-          id: 'comment-123',
-          username: 'dicoding',
-          date: newDate,
-          content: 'content',
-          replies: [mockReply],
-        },
-      ],
+    const expectedDetailReply = [
+      {
+        id: DUMMY.REPLY_ID,
+        commentid: DUMMY.COMMENT_ID,
+        content: DUMMY.REPLY_CONTENT,
+        date: DUMMY.DATE,
+        username: DUMMY.USER_USERNAME,
+        is_delete: true,
+      },
+    ];
+
+    const expectedComment = [
+      {
+        id: DUMMY.COMMENT_ID,
+        username: DUMMY.USER_USERNAME,
+        date: DUMMY.DATE,
+        content: DUMMY.COMMENT_CONTENT,
+        is_delete: false,
+        replies: expectedDetailReply,
+      },
+    ];
+
+    const expectedDetailThread = {
+      id: DUMMY.THREAD_ID,
+      title: DUMMY.THREAD_TITLE,
+      body: DUMMY.THREAD_BODY,
+      date: DUMMY.DATE,
+      username: DUMMY.USER_USERNAME,
+      comments: expectedComment,
     };
 
-    /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository();
+    const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.getDetailThreadById = jest.fn().mockImplementation(() => Promise.resolve(mockThread));
-    mockReplyRepository.getRepliesFromComment = jest.fn().mockImplementation(() => Promise.resolve(mockReply));
+    mockThreadRepository.getThreadById = jest.fn(() => expectedDetailThread);
+    mockCommentRepository.getCommentByThreadId = jest.fn(() => expectedComment);
+    mockCommentRepository.getCommentByThreadId = jest.fn(() =>
+      Promise.resolve(
+        expectedComment.map((comment) => {
+          comment.content = comment.is_delete ? "**komentar telah dihapus**" : comment.content;
+          return comment;
+        })
+      )
+    );
+    mockReplyRepository.getRepliesByThreadId = jest.fn(() =>
+      Promise.resolve(
+        expectedDetailReply.map((reply) => {
+          reply.content = reply.is_delete ? "**balasan telah dihapus**" : reply.content;
+          return reply;
+        })
+      )
+    );
 
-    /** creating use case instance */
-    const getDetailThreadById = new GetDetailThreadUseCase({
+    const getDetailThreadUseCase = new GetDetailThreadUseCase({
       threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
     });
 
     // Action
-    const threadComment = await getDetailThreadById.execute(payload.threadId);
+    const detailThread = await getDetailThreadUseCase.execute(useCaseParams);
 
     // Assert
-    expect(threadComment).toStrictEqual({
-      id: mockThread.id,
-      title: mockThread.title,
-      body: mockThread.body,
-      date: mockThread.date,
-      username: mockThread.username,
-      comments: mockThread.comments,
-    });
-
-    expect(mockThreadRepository.getDetailThreadById).toHaveBeenCalledWith(payload.threadId);
-    expect(mockReplyRepository.getRepliesFromComment).toHaveBeenCalledWith(mockThread.comments[0].id);
+    expect(detailThread).toEqual(expectedDetailThread);
   });
 });

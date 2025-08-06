@@ -1,7 +1,7 @@
 const NotFoundError = require("../../Commons/exceptions/NotFoundError");
 const { NEW_DATE } = require("../../Commons/utils/Constants");
 const ThreadRepository = require("../../Domains/threads/ThreadRepository");
-
+const Thread = require("../../Domains/threads/entities/Thread");
 class ThreadRepositoryPostgres extends ThreadRepository {
   constructor(pool, idGenerator) {
     super();
@@ -12,7 +12,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   async addThread(thread) {
     const { title, body, date = NEW_DATE, owner } = thread;
     const id = `thread-${this._idGenerator()}`;
-
+    new Thread({ title, body, date, owner });
     const query = {
       text: "INSERT INTO threads VALUES($1,$2,$3,$4,$5) RETURNING id, title, owner",
       values: [id, title, body, date, owner],
@@ -40,33 +40,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     return result.rows[0];
-  }
-
-  async getDetailThreadById(id) {
-    const thread = await this.getThreadById(id);
-    const query = {
-      text: `SELECT comments.id, users.username, comments.date, comments.content,
-      CASE 
-          WHEN comments.is_delete = TRUE THEN '**komentar telah dihapus**'
-          ELSE comments.content
-      END
-      FROM comments
-      JOIN users
-      ON comments.owner = users.id
-      JOIN threads
-      ON comments.thread_id = threads.id
-      WHERE threads.id = $1
-      ORDER BY comments.date ASC`,
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-    const comments = result.rows;
-    const detailThread = {
-      ...thread,
-      comments,
-    };
-    return detailThread;
   }
 }
 
