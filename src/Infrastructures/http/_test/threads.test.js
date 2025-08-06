@@ -136,9 +136,9 @@ describe("/threads endpoint", () => {
     it("should response 200 and return thread detail", async () => {
       // Arrange
       const server = await createServer(container);
-      const { accessToken, id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+      const { id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
 
-      const threadId = "thread-123";
+      const threadId = DUMMY.THREAD_ID;
       await ThreadsTableTestHelper.addThread({
         id: threadId,
         title: DUMMY.THREAD_TITLE,

@@ -1,21 +1,22 @@
-const DeleteCommentUseCase = require('../DeleteCommentUseCase');
-const CommentRepository = require('../../../Domains/comments/CommentRepository');
-const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
+const DeleteCommentUseCase = require("../DeleteCommentUseCase");
+const CommentRepository = require("../../../Domains/comments/CommentRepository");
+const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const { DUMMY } = require("../../../Commons/utils/Constants");
 
-describe('DeleteCommentUseCase', () => {
-  it('should throw error when use case payload do not contain needed property', async () => {
+describe("DeleteCommentUseCase", () => {
+  it("should throw error when use case payload do not contain needed property", async () => {
     // Arrange
     const payload = {
-      commentId: 'comment-123',
-      threadId: 'thread-123',
+      commentId: DUMMY.COMMENT_ID,
+      threadId: DUMMY.THREAD_ID,
     };
     const deleteCommentUseCase = new DeleteCommentUseCase({});
 
     // Action & Assert
-    await expect(deleteCommentUseCase.execute(payload.commentId, payload.threadId)).rejects.toThrowError('DELETE_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+    await expect(deleteCommentUseCase.execute(payload.commentId, payload.threadId)).rejects.toThrowError("DELETE_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY");
   });
 
-  it('should throw error when use case payload do not meet data type', async () => {
+  it("should throw error when use case payload do not meet data type", async () => {
     // Arrange
     const payload = {
       commentId: 123,
@@ -25,15 +26,15 @@ describe('DeleteCommentUseCase', () => {
     const deleteCommentUseCase = new DeleteCommentUseCase({});
 
     // Action & Assert
-    expect(deleteCommentUseCase.execute(payload.commentId, payload.threadId, payload.userId)).rejects.toThrowError('DELETE_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(deleteCommentUseCase.execute(payload.commentId, payload.threadId, payload.userId)).rejects.toThrowError("DELETE_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION");
   });
 
-  it('should orchestrating the deleteComment action correctly', async () => {
+  it("should orchestrating the deleteComment action correctly", async () => {
     // Arrange
     const payload = {
-      commentId: 'comment-123',
-      threadId: 'thread-123',
-      userId: 'user-123',
+      commentId: DUMMY.COMMENT_ID,
+      threadId: DUMMY.THREAD_ID,
+      userId: DUMMY.OWNER,
     };
 
     // prepare dependencies (mocking needed class)

@@ -28,7 +28,7 @@ describe("GetDetailThreadUseCase", () => {
         username: DUMMY.USER_USERNAME,
         date: DUMMY.DATE,
         content: DUMMY.COMMENT_CONTENT,
-        is_delete: false,
+        is_delete: true,
         replies: expectedDetailReply,
       },
     ];
@@ -51,7 +51,7 @@ describe("GetDetailThreadUseCase", () => {
     mockCommentRepository.getCommentByThreadId = jest.fn(() =>
       Promise.resolve(
         expectedComment.map((comment) => {
-          comment.content = comment.is_delete ? "**komentar telah dihapus**" : comment.content;
+          comment.content = comment.deleted ? "**komentar telah dihapus**" : comment.content;
           return comment;
         })
       )
@@ -59,7 +59,7 @@ describe("GetDetailThreadUseCase", () => {
     mockReplyRepository.getRepliesByThreadId = jest.fn(() =>
       Promise.resolve(
         expectedDetailReply.map((reply) => {
-          reply.content = reply.is_delete ? "**balasan telah dihapus**" : reply.content;
+          reply.content = reply.deleted ? "**balasan telah dihapus**" : reply.content;
           return reply;
         })
       )
@@ -75,6 +75,9 @@ describe("GetDetailThreadUseCase", () => {
     const detailThread = await getDetailThreadUseCase.execute(useCaseParams);
 
     // Assert
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(useCaseParams.threadId);
+    expect(mockCommentRepository.getCommentByThreadId).toBeCalledWith(useCaseParams.threadId);
+    expect(mockReplyRepository.getRepliesByThreadId).toBeCalledWith(useCaseParams.threadId);
     expect(detailThread).toEqual(expectedDetailThread);
   });
 });

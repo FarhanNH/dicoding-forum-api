@@ -37,7 +37,7 @@ describe("/comments endpoint", () => {
         await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID, owner: id });
 
         const requestPayload = {
-          content: "Ini komentar",
+          content: DUMMY.COMMENT_CONTENT,
         };
 
         // Action
@@ -62,7 +62,7 @@ describe("/comments endpoint", () => {
         const server = await createServer(container);
         const threadId = DUMMY.THREAD_ID;
         const requestPayload = {
-          content: "Ini komentar",
+          content: DUMMY.COMMENT_CONTENT,
         };
 
         // Action
@@ -85,7 +85,7 @@ describe("/comments endpoint", () => {
         const threadId = DUMMY.THREAD_ID;
 
         const requestPayload = {
-          content: "Ini komentar",
+          content: DUMMY.COMMENT_CONTENT,
         };
 
         // Action
@@ -108,23 +108,10 @@ describe("/comments endpoint", () => {
       it("should response 400 when comment with bad payload", async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUserId = "user-123";
-        const mockThreadId = "thread-123";
-        const hashedPassword = await passwordHash.hash("secret");
-        await UsersTableTestHelper.addUser({ id: mockUserId, username: "dicoding", password: hashedPassword });
-        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
+        const mockThreadId = DUMMY.THREAD_ID;
 
-        const loginResponse = await server.inject({
-          method: "POST",
-          url: "/authentications",
-          payload: {
-            username: "dicoding",
-            password: "secret",
-          },
-        });
-
-        const loginResponseJson = JSON.parse(loginResponse.payload);
-        const accessToken = loginResponseJson.data.accessToken;
+        const { accessToken, id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: id });
 
         const requestPayload = {};
 
@@ -157,28 +144,14 @@ describe("/comments endpoint", () => {
       it("should response 200 and retun message success", async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUserId = "user-123";
-        const mockThreadId = "thread-123";
-        const mockCommentId = "comment-123";
-        const hashedPassword = await passwordHash.hash("secret");
-        await UsersTableTestHelper.addUser({ id: mockUserId, username: "dicoding", password: hashedPassword });
-        const user = await UsersTableTestHelper.getUserById(mockUserId);
+        const mockThreadId = DUMMY.THREAD_ID;
+        const mockCommentId = DUMMY.COMMENT_ID;
+        const { accessToken, id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+        const mockUserId = id;
         await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
         const thread = await ThreadsTableTestHelper.getThreadById(mockThreadId);
         await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
         const comment = await CommentsTableTestHelper.getCommentById(mockCommentId);
-
-        const loginResponse = await server.inject({
-          method: "POST",
-          url: "/authentications",
-          payload: {
-            username: user[0].username,
-            password: "secret",
-          },
-        });
-
-        const loginResponseJson = JSON.parse(loginResponse.payload);
-        const accessToken = loginResponseJson.data.accessToken;
 
         // Action
         const response = await server.inject({
@@ -198,11 +171,11 @@ describe("/comments endpoint", () => {
       it("should response 401 when delete comment with no authentication", async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUserId = "user-123";
-        const mockThreadId = "thread-123";
-        const mockCommentId = "comment-123";
+        const mockUserId = DUMMY.OWNER;
+        const mockThreadId = DUMMY.THREAD_ID;
+        const mockCommentId = DUMMY.COMMENT_ID;
         const hashedPassword = await passwordHash.hash("secret");
-        await UsersTableTestHelper.addUser({ id: mockUserId, username: "dicoding", password: hashedPassword });
+        await UsersTableTestHelper.addUser({ id: mockUserId, username: DUMMY.USER_USERNAME, password: hashedPassword });
         await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
         const thread = await ThreadsTableTestHelper.getThreadById(mockThreadId);
         await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
@@ -223,25 +196,11 @@ describe("/comments endpoint", () => {
       it("should response 400 when delete comment with not found comment", async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUserId = "user-123";
-        const mockThreadId = "thread-123";
-        const hashedPassword = await passwordHash.hash("secret");
-        await UsersTableTestHelper.addUser({ id: mockUserId, username: "dicoding", password: hashedPassword });
-        const user = await UsersTableTestHelper.getUserById(mockUserId);
+        const mockThreadId = DUMMY.THREAD_ID;
+        const { accessToken, id } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+        const mockUserId = id;
         await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
         const thread = await ThreadsTableTestHelper.getThreadById(mockThreadId);
-
-        const loginResponse = await server.inject({
-          method: "POST",
-          url: "/authentications",
-          payload: {
-            username: user[0].username,
-            password: "secret",
-          },
-        });
-
-        const loginResponseJson = JSON.parse(loginResponse.payload);
-        const accessToken = loginResponseJson.data.accessToken;
 
         // Action
         const response = await server.inject({
@@ -262,30 +221,16 @@ describe("/comments endpoint", () => {
       it("should response 403 when delete comment with wrong owner", async () => {
         // Arrange
         const server = await createServer(container);
-        const mockUserId = "user-123";
-        const mockUserIdX = "user-999";
-        const mockThreadId = "thread-123";
-        const mockCommentId = "comment-123";
+        const mockUserIdX = DUMMY.OWNER_OTHER;
+        const mockThreadId = DUMMY.THREAD_ID;
+        const mockCommentId = DUMMY.COMMENT_ID;
         const hashedPassword = await passwordHash.hash("secret");
-        await UsersTableTestHelper.addUser({ id: mockUserId, username: "dicoding", password: hashedPassword });
         await UsersTableTestHelper.addUser({ id: mockUserIdX, username: "dimari", password: hashedPassword });
-        const user = await UsersTableTestHelper.getUserById(mockUserIdX);
-        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
+        const { accessToken } = await AuthenticationsTableTestHelper.getAccessToken({ server });
+        await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserIdX });
         const thread = await ThreadsTableTestHelper.getThreadById(mockThreadId);
-        await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserId, thread_id: mockThreadId });
+        await CommentsTableTestHelper.addComment({ id: mockCommentId, owner: mockUserIdX, thread_id: mockThreadId });
         const comment = await CommentsTableTestHelper.getCommentById(mockCommentId);
-
-        const loginResponse = await server.inject({
-          method: "POST",
-          url: "/authentications",
-          payload: {
-            username: user[0].username,
-            password: "secret",
-          },
-        });
-
-        const loginResponseJson = JSON.parse(loginResponse.payload);
-        const accessToken = loginResponseJson.data.accessToken;
 
         // Action
         const response = await server.inject({

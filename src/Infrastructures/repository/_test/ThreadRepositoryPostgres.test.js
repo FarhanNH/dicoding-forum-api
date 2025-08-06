@@ -79,8 +79,9 @@ describe("ThreadRepositoryPostgres", () => {
 
     it("should persist get thread by id and return thread correctly", async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER });
-      await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID });
+      const mockDate = DUMMY.DATE;
+      await UsersTableTestHelper.addUser({ id: DUMMY.OWNER, username: DUMMY.USER_USERNAME });
+      await ThreadsTableTestHelper.addThread({ id: DUMMY.THREAD_ID, owner: DUMMY.OWNER, date: mockDate });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
 
       // Action
@@ -92,6 +93,13 @@ describe("ThreadRepositoryPostgres", () => {
       expect(result.body).toBeDefined();
       expect(result.date).toBeDefined();
       expect(result.username).toBeDefined();
+      expect(result).toStrictEqual({
+        id: DUMMY.THREAD_ID,
+        title: DUMMY.THREAD_TITLE,
+        body: DUMMY.THREAD_BODY,
+        date: mockDate,
+        username: DUMMY.USER_USERNAME,
+      });
     });
   });
 });

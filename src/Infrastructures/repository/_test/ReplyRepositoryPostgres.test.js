@@ -207,7 +207,42 @@ describe("ReplyRepositoryPostgres", () => {
     });
   });
 
-  describe("getRepliesFromComment", () => {
+  describe("getRepliesByThreadId function", () => {
+    it("should return detail thread correctly", async () => {
+      // Arrange
+      const payload = {
+        thread_id: DUMMY.THREAD_ID,
+      };
+
+      const mockReply = {
+        id: DUMMY.REPLY_ID,
+        content: DUMMY.REPLY_CONTENT,
+        date: DUMMY.DATE,
+        username: DUMMY.USER_USERNAME,
+        commentid: DUMMY.COMMENT_ID,
+        deleted: false,
+      };
+
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await CommentsTableTestHelper.addComment({});
+      await RepliesTableTestHelper.addReply({ id: mockReply.id, content: mockReply.content, date: mockReply.date });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      const reply = await replyRepositoryPostgres.getRepliesByThreadId(payload.thread_id);
+
+      // Assert
+      expect(reply[0].id).toBe(mockReply.id);
+      expect(reply[0].content).toBe(mockReply.content);
+      expect(reply[0].date).toEqual(mockReply.date);
+      expect(reply[0].username).toBe(mockReply.username);
+      expect(reply[0].commentid).toBe(mockReply.commentid);
+      expect(reply[0].deleted).toBe(mockReply.deleted);
+    });
+  });
+
+  describe("getRepliesFromComment function", () => {
     it("should return detail thread correctly", async () => {
       // Arrange
       const payload = {

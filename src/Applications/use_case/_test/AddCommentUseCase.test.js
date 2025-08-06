@@ -3,29 +3,30 @@ const CommentRepository = require("../../../Domains/comments/CommentRepository")
 const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
 const UserRepository = require("../../../Domains/users/UserRepository");
 const AddCommentUseCase = require("../AddCommentUseCase");
+const { DUMMY } = require("../../../../src/Commons/utils/Constants");
 
 describe("AddCommentUseCase", () => {
   it("should orchectrating the add comment action correctly", async () => {
     // Arrange
     const mockUser = {
-      id: "user-123",
+      id: DUMMY.OWNER,
     };
 
     const mockThread = {
-      id: "thread-123",
-      title: "First Thread",
-      body: "Lorem ipsum asdadadjakkafkahfkakfdajkfj",
+      id: DUMMY.THREAD_ID,
+      title: DUMMY.THREAD_TITLE,
+      body: DUMMY.THREAD_BODY,
       owner: mockUser.id,
     };
 
     const useCasePayload = {
-      content: "Lorem ipsum asdadadjakkafkahfkakfdajkfj",
+      content: DUMMY.THREAD_BODY,
       owner: mockUser.id,
       thread_id: mockThread.id,
     };
 
     const mockComment = {
-      id: "comment-123",
+      id: DUMMY.COMMENT_ID,
       ...useCasePayload,
     };
 
@@ -49,12 +50,8 @@ describe("AddCommentUseCase", () => {
     const addedComment = await addCommentUseCase.execute(useCasePayload);
 
     // Assert
-    expect(addedComment).toStrictEqual({
-      id: mockComment.id,
-      content: useCasePayload.content,
-      owner: useCasePayload.owner,
-      thread_id: useCasePayload.thread_id,
-    });
+    expect(mockUserRepository.getUserById).toBeCalledWith(useCasePayload.owner);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(useCasePayload.thread_id);
     expect(mockCommentRepository.addComment).toBeCalledWith(
       new Comment({
         content: useCasePayload.content,
@@ -62,5 +59,11 @@ describe("AddCommentUseCase", () => {
         thread_id: useCasePayload.thread_id,
       })
     );
+    expect(addedComment).toStrictEqual({
+      id: mockComment.id,
+      content: useCasePayload.content,
+      owner: useCasePayload.owner,
+      thread_id: useCasePayload.thread_id,
+    });
   });
 });

@@ -1,22 +1,23 @@
-const DeleteReplyUseCase = require('../DeleteReplyUseCase');
-const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
-const CommentRepository = require('../../../Domains/comments/CommentRepository');
-const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
+const DeleteReplyUseCase = require("../DeleteReplyUseCase");
+const ReplyRepository = require("../../../Domains/replies/ReplyRepository");
+const CommentRepository = require("../../../Domains/comments/CommentRepository");
+const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const { DUMMY } = require("../../../Commons/utils/Constants");
 
-describe('DeleteReplyUseCase', () => {
-  it('should throw error when payload not contain needed property', async () => {
+describe("DeleteReplyUseCase", () => {
+  it("should throw error when payload not contain needed property", async () => {
     // Arrange
     const payload = {
-      replyId: 'reply-123',
-      owner: 'user-123',
+      replyId: DUMMY.REPLY_ID,
+      owner: DUMMY.OWNER,
     };
     const deleteReplyUseCase = new DeleteReplyUseCase({});
 
     // Action & Assert
-    await expect(deleteReplyUseCase.execute(payload.replyId, payload.owner)).rejects.toThrowError('REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
+    await expect(deleteReplyUseCase.execute(payload.replyId, payload.owner)).rejects.toThrowError("REPLY.NOT_CONTAIN_NEEDED_PROPERTY");
   });
 
-  it('should throw error when payload not meet data type specification', async () => {
+  it("should throw error when payload not meet data type specification", async () => {
     // Arrange
     const payload = {
       replyId: 123,
@@ -27,16 +28,16 @@ describe('DeleteReplyUseCase', () => {
     const deleteReplyUseCase = new DeleteReplyUseCase({});
 
     // Action & Assert
-    expect(deleteReplyUseCase.execute(payload.replyId, payload.owner, payload.thread_id, payload.comment_id)).rejects.toThrowError('REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(deleteReplyUseCase.execute(payload.replyId, payload.owner, payload.thread_id, payload.comment_id)).rejects.toThrowError("REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION");
   });
 
-  it('should orchestrating the DeleteReply correctly', async () => {
+  it("should orchestrating the DeleteReply correctly", async () => {
     // Arrange
     const payload = {
-      replyId: 'reply-123',
-      owner: 'user-123',
-      thread_id: 'thread-123',
-      comment_id: 'comment-123',
+      replyId: DUMMY.REPLY_ID,
+      owner: DUMMY.OWNER,
+      thread_id: DUMMY.THREAD_ID,
+      comment_id: DUMMY.COMMENT_ID,
     };
     const mockVerifyReply = {
       id: payload.replyId,
