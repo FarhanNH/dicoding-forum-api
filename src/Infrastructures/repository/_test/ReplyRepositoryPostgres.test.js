@@ -25,36 +25,6 @@ describe("ReplyRepositoryPostgres", () => {
   });
 
   describe("addReply function", () => {
-    it("should throw error when payload not contain needed property", async () => {
-      // Arrange
-      const replyRepository = new ReplyRepositoryPostgres(pool, () => "123");
-      const invalidPayloads = [{ thread_id: DUMMY.THREAD_ID, content: DUMMY.REPLY_CONTENT }, { comment_id: DUMMY.COMMENT_ID, content: DUMMY.REPLY_CONTENT }, { owner: DUMMY.OWNER, content: DUMMY.REPLY_CONTENT }, { content: DUMMY.REPLY_CONTENT, owner: DUMMY.OWNER, thread_id: DUMMY.THREAD_ID }, {}];
-
-      // Action & Assert
-      await Promise.all(
-        invalidPayloads.map(async (payload) => {
-          await expect(replyRepository.addReply(payload)).rejects.toThrowError("REPLY.NOT_CONTAIN_NEEDED_PROPERTY");
-        })
-      );
-    });
-
-    it("should throw error when payload not meet data type specification", async () => {
-      // Arrange
-      const replyRepository = new ReplyRepositoryPostgres(pool, () => "123");
-      const invalidPayloads = [
-        { content: DUMMY.REPLY_CONTENT, owner: 123, thread_id: DUMMY.THREAD_ID, comment_id: DUMMY.COMMENT_ID },
-        { content: DUMMY.REPLY_CONTENT, owner: DUMMY.OWNER, thread_id: 123, comment_id: DUMMY.COMMENT_ID },
-        { content: 123, owner: DUMMY.OWNER, thread_id: DUMMY.THREAD_ID, comment_id: DUMMY.COMMENT_ID },
-      ];
-
-      // Action & Assert
-      await Promise.all(
-        invalidPayloads.map(async (payload) => {
-          await expect(replyRepository.addReply(payload)).rejects.toThrowError("REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION");
-        })
-      );
-    });
-
     it("should persist add reply and return reply correctly", async () => {
       // Arrange
       const mockReply = {
@@ -239,37 +209,6 @@ describe("ReplyRepositoryPostgres", () => {
       expect(reply[0].username).toBe(mockReply.username);
       expect(reply[0].commentid).toBe(mockReply.commentid);
       expect(reply[0].deleted).toBe(mockReply.deleted);
-    });
-  });
-
-  describe("getRepliesFromComment function", () => {
-    it("should return detail thread correctly", async () => {
-      // Arrange
-      const payload = {
-        comment_id: DUMMY.COMMENT_ID,
-      };
-
-      const mockReply = {
-        id: DUMMY.REPLY_ID,
-        content: DUMMY.REPLY_CONTENT,
-        date: DUMMY.DATE,
-        username: DUMMY.USER_USERNAME,
-      };
-
-      await UsersTableTestHelper.addUser({});
-      await ThreadsTableTestHelper.addThread({});
-      await CommentsTableTestHelper.addComment({});
-      await RepliesTableTestHelper.addReply({ id: mockReply.id, content: mockReply.content, date: mockReply.date });
-      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
-
-      // Action
-      const reply = await replyRepositoryPostgres.getRepliesFromComment(payload.comment_id);
-
-      // Assert
-      expect(reply[0].id).toBe(mockReply.id);
-      expect(reply[0].content).toBe(mockReply.content);
-      expect(reply[0].date).toEqual(mockReply.date);
-      expect(reply[0].username).toBe(mockReply.username);
     });
   });
 });

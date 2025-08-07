@@ -32,7 +32,7 @@ const RepliesTableTestHelper = {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError("reply tidak ditemukan");
     }
@@ -49,31 +49,10 @@ const RepliesTableTestHelper = {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError("reply tidak ditemukan");
     }
-  },
-
-  async getRepliesFromComment(id) {
-    const query = {
-      text: `SELECT replies.id, replies.content, replies.date, users.username,
-      CASE
-        WHEN replies.is_delete = TRUE THEN '**balasan telah dihapus**'
-        ELSE replies.content
-      END
-      FROM replies
-      JOIN users
-      ON replies.owner = users.id
-      JOIN comments
-      ON replies.comment_id = comments.id
-      WHERE comments.id = $1
-      ORDER BY replies.date ASC`,
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows;
   },
 
   async cleanTable() {

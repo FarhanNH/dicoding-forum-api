@@ -11,9 +11,6 @@ class ReplyRepository {
   async getRepliesByThreadId(id) {
     throw new Error("REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED");
   }
-  async getRepliesFromComment(id) {
-    throw new Error("REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED");
-  }
 }
 
 module.exports = ReplyRepository;

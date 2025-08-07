@@ -13,11 +13,11 @@ class ReplyRepositoryPostgres extends ReplyRepository {
   async addReply(payload) {
     const { content, date = new Date().toISOString(), owner, thread_id, comment_id } = payload;
     const id = `reply-${this._idGenerator()}`;
-    new Reply({ content, date, owner, thread_id, comment_id });
+    const reply = new Reply({ content, date, owner, thread_id, comment_id });
 
     const query = {
-      text: "INSERT INTO replies VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner",
-      values: [id, content, date, owner, thread_id, comment_id],
+      text: "INSERT INTO replies(id, content, date, owner, thread_id, comment_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner",
+      values: [id, reply.content, reply.date, reply.owner, reply.thread_id, reply.comment_id],
     };
 
     const result = await this._pool.query(query);
@@ -26,7 +26,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
 
   async getReplyById(id) {
     const query = {
-      text: "SELECT content FROM replies WHERE id = $1",
+      text: "SELECT * FROM replies WHERE id = $1",
       values: [id],
     };
 
@@ -51,7 +51,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
       throw new NotFoundError("reply tidak ditemukan");
     }
 
-    const verified = result.rows[0].owner == owner;
+    const verified = result.rows[0].owner === owner;
     if (!verified) {
       throw new AuthorizationError("Akses ditolak");
     }
@@ -71,33 +71,13 @@ class ReplyRepositoryPostgres extends ReplyRepository {
 
   async getRepliesByThreadId(threadId) {
     const query = {
-      text: `SELECT replies.id, replies.content, replies.date, users.username, replies.comment_id as commentid, replies.is_delete as deleted
-      FROM replies
-      JOIN users ON replies.owner = users.id
-      WHERE replies.thread_id = $1
-      ORDER BY replies.date ASC`,
+      text: `SELECT replies.id, replies.content, replies.date, users.username, 
+             replies.comment_id as commentid, replies.is_delete as deleted
+             FROM replies
+             JOIN users ON replies.owner = users.id
+             WHERE replies.thread_id = $1
+             ORDER BY replies.date ASC`,
       values: [threadId],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows;
-  }
-
-  async getRepliesFromComment(id) {
-    const query = {
-      text: `SELECT replies.id, replies.content, replies.date, users.username,
-      CASE
-        WHEN replies.is_delete = TRUE THEN '**balasan telah dihapus**'
-        ELSE replies.content
-      END
-      FROM replies
-      JOIN users
-      ON replies.owner = users.id
-      JOIN comments
-      ON replies.comment_id = comments.id
-      WHERE comments.id = $1
-      ORDER BY replies.date ASC`,
-      values: [id],
     };
 
     const result = await this._pool.query(query);

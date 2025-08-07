@@ -2,11 +2,13 @@ class Reply {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    const { content, owner, thread_id, comment_id } = payload;
+    const { content, owner, thread_id, comment_id, date = new Date().toISOString() } = payload;
     this.content = content;
     this.owner = owner;
     this.thread_id = thread_id;
     this.comment_id = comment_id;
+    this.date = date;
+    this.is_deleted = false;
   }
 
   _verifyPayload({ content, owner, thread_id, comment_id }) {

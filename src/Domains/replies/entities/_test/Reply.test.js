@@ -1,17 +1,17 @@
-const Reply = require('../Reply');
+const Reply = require("../Reply");
 
-describe('Reply entities', () => {
-  it('should throw error when payload do not contain needed property', () => {
+describe("Reply entities", () => {
+  it("should throw error when payload do not contain needed property", () => {
     // Arrange
     const payload = {
-      content: 'Ini balasan',
+      content: "Ini balasan",
     };
 
     // Action & Assert
-    expect(() => new Reply(payload)).toThrowError('REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new Reply(payload)).toThrowError("REPLY.NOT_CONTAIN_NEEDED_PROPERTY");
   });
 
-  it('should throw error when payload do not meet data type', () => {
+  it("should throw error when payload do not meet data type", () => {
     // Arrange
     const payload = {
       content: true,
@@ -21,16 +21,16 @@ describe('Reply entities', () => {
     };
 
     // Action & Assert
-    expect(() => new Reply(payload)).toThrowError('REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new Reply(payload)).toThrowError("REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION");
   });
 
-  it('should create reply object correctly', () => {
+  it("should create reply object correctly", () => {
     // Arrange
     const payload = {
-      content: 'Ini balasan',
-      owner: 'user-123',
-      thread_id: 'thread-123',
-      comment_id: 'comment-123',
+      content: "Ini balasan",
+      owner: "user-123",
+      thread_id: "thread-123",
+      comment_id: "comment-123",
     };
 
     // Action
@@ -38,5 +38,10 @@ describe('Reply entities', () => {
 
     // Assert
     expect(reply.content).toEqual(payload.content);
+    expect(reply.owner).toEqual(payload.owner);
+    expect(reply.thread_id).toEqual(payload.thread_id);
+    expect(reply.comment_id).toEqual(payload.comment_id);
+    expect(reply.date).toBeDefined();
+    expect(reply.is_deleted).toEqual(false);
   });
 });

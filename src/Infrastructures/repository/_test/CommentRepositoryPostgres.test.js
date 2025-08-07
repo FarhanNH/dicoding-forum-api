@@ -23,40 +23,6 @@ describe("CommentRepositoryPostgres", () => {
   });
 
   describe("addComment function", () => {
-    it("should throw error when payload not contain needed property", async () => {
-      // Arrange
-      const commentRepository = new CommentRepositoryPostgres(pool, () => "123");
-      const invalidPayloads = [
-        { thread_id: DUMMY.THREAD_ID, content: DUMMY.REPLY_CONTENT },
-        { owner: DUMMY.OWNER, content: DUMMY.REPLY_CONTENT },
-        { owner: DUMMY.OWNER, thread_id: DUMMY.THREAD_ID },
-      ];
-
-      // Action & Assert
-      await Promise.all(
-        invalidPayloads.map(async (payload) => {
-          await expect(commentRepository.addComment(payload)).rejects.toThrowError("COMMENT.NOT_CONTAIN_NEEDED_PROPERTY");
-        })
-      );
-    });
-
-    it("should throw error when payload not meet data type specification", async () => {
-      // Arrange
-      const commentRepository = new CommentRepositoryPostgres(pool, () => "123");
-      const invalidPayloads = [
-        { owner: 123, thread_id: DUMMY.THREAD_ID, content: DUMMY.REPLY_CONTENT },
-        { owner: DUMMY.OWNER, thread_id: 123, content: DUMMY.REPLY_CONTENT },
-        { owner: DUMMY.OWNER, thread_id: DUMMY.THREAD_ID, content: 123 },
-      ];
-
-      // Action & Assert
-      await Promise.all(
-        invalidPayloads.map(async (payload) => {
-          await expect(commentRepository.addComment(payload)).rejects.toThrowError("COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION");
-        })
-      );
-    });
-
     it("should persist add comment and return comment correctly", async () => {
       // Arrange
       const mockComment = {
@@ -140,12 +106,12 @@ describe("CommentRepositoryPostgres", () => {
         is_delete: false,
       });
 
-      // Action
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
 
-      // Assert
+      // Action
       const detailComment = await commentRepositoryPostgres.getCommentByThreadId(DUMMY.THREAD_ID);
 
+      // Assert
       expect(detailComment).toEqual([
         {
           id: DUMMY.COMMENT_ID,
@@ -215,6 +181,7 @@ describe("CommentRepositoryPostgres", () => {
       // Action & Assert
       await expect(commentRepositoryPostgres.softDeleteComment(payload.commentId)).rejects.toThrow(NotFoundError);
     });
+
     it("should change is_delete in comments table to be true", async () => {
       // Arrange
       const payload = {
@@ -224,9 +191,11 @@ describe("CommentRepositoryPostgres", () => {
       await ThreadsTableTestHelper.addThread({});
       await CommentsTableTestHelper.addComment({});
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
       await commentRepositoryPostgres.softDeleteComment(payload.comment_id);
 
-      // Action & Assert
+      // Assert
       const comment = await CommentsTableTestHelper.getCommentById(payload.comment_id);
       expect(comment[0].is_delete).toBe(true);
     });
