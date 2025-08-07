@@ -5,24 +5,26 @@ class GetDetailThreadUseCase {
     this._replyRepository = replyRepository;
   }
 
-  async execute(useCaseParams) {
-    const { threadId } = useCaseParams;
+  async execute({ threadId }) {
     const detailThread = await this._threadRepository.getThreadById(threadId);
     const threadReplies = await this._replyRepository.getRepliesByThreadId(threadId);
 
     detailThread.comments = await this._commentRepository.getCommentByThreadId(threadId);
-    detailThread.comments.map((comment) => {
-      comment.replies = threadReplies
+    detailThread.comments = detailThread.comments.map((comment) => {
+      const replies = threadReplies
         .filter((reply) => reply.commentid === comment.id)
-        .map((reply) => {
-          reply.content = reply.deleted ? "**balasan telah dihapus**" : reply.content;
-          return { deleted: reply.deleted, commentid: reply.commentid, ...reply };
-        });
+        .map(({ commentid, deleted, content, ...reply }) => ({
+          ...reply,
+          content: deleted ? "**balasan telah dihapus**" : content,
+        }));
 
       comment.content = comment.deleted ? "**komentar telah dihapus**" : comment.content;
       delete comment.deleted;
 
-      return comment;
+      return {
+        ...comment,
+        replies,
+      };
     });
 
     return detailThread;

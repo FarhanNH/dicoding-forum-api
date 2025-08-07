@@ -14,6 +14,7 @@ describe("AddReplyUseCase", () => {
       owner: DUMMY.OWNER,
       thread_id: DUMMY.THREAD_ID,
       comment_id: DUMMY.COMMENT_ID,
+      date: DUMMY.DATE,
     };
 
     const mockAddedReply = {
@@ -54,6 +55,7 @@ describe("AddReplyUseCase", () => {
         owner: useCasePayload.owner,
         thread_id: useCasePayload.thread_id,
         comment_id: useCasePayload.comment_id,
+        date: useCasePayload.date,
       })
     );
     expect(addedReply).toStrictEqual({

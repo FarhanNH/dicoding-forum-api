@@ -14,7 +14,6 @@ describe("GetDetailThreadUseCase", () => {
     const expectedDetailReply = [
       {
         id: DUMMY.REPLY_ID,
-        commentid: DUMMY.COMMENT_ID,
         content: DUMMY.REPLY_CONTENT,
         date: DUMMY.DATE,
         username: DUMMY.USER_USERNAME,

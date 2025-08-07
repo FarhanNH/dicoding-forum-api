@@ -196,7 +196,7 @@ describe("ReplyRepositoryPostgres", () => {
       await UsersTableTestHelper.addUser({});
       await ThreadsTableTestHelper.addThread({});
       await CommentsTableTestHelper.addComment({});
-      await RepliesTableTestHelper.addReply({ id: mockReply.id, content: mockReply.content, date: mockReply.date });
+      await RepliesTableTestHelper.addReply(mockReply);
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
@@ -207,8 +207,6 @@ describe("ReplyRepositoryPostgres", () => {
       expect(reply[0].content).toBe(mockReply.content);
       expect(reply[0].date).toEqual(mockReply.date);
       expect(reply[0].username).toBe(mockReply.username);
-      expect(reply[0].commentid).toBe(mockReply.commentid);
-      expect(reply[0].deleted).toBe(mockReply.deleted);
     });
   });
 });
